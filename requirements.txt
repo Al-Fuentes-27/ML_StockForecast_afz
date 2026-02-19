@@ -1,0 +1,17 @@
+Python packages that the VPA depends on.
+
+1. conda install python==3.11
+2.conda install scikit-learn
+3. conda install pandas-datareader==0.10.0
+4. conda install matplotlib
+5. conda install statsmodels
+6. pip install yfinance
+7. conda install pandas==2.2.3
+8. conda install numpy==2.4.2
+
+
+
+
+
+
+
