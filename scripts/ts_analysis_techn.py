@@ -84,13 +84,13 @@ class TimeSeries:
     # Public methods for specific calculations
     # ----------------------------------------------------------------------
 
-    def add_percentage_change(self, periods=5, as_percent=False):
+    def add_percentage_change(self, periods = 1, as_percent = False):
         """
         Add percentage change columns and shifted original columns.
 
         For each column, two new columns are added:
         - For 'Price'          : 'PriceRise' and '5dayPriceShift'
-        - For 'Price_idx'      : 'PriceRise_idx' and '5dayPrice_idxShift'
+        - For 'Price_idx'      : 'PriceRise_idx' and '5dayPriceShift_idx'
         """
         def percentageChange(series, base, suffix, periods, as_percent):
             pct = series.pct_change(periods)
@@ -98,21 +98,60 @@ class TimeSeries:
             if as_percent:
                 pct = pct * 100
 
+
+            day_part = "day" if periods == 1 else "days"
+            base_name = f"{periods}{day_part}{base}"
+            
             if suffix is None:
-                pct_name = f"{periods}day/sRise"
-                shift_name = f"{periods}day/sShift"
-
+                pct.name = f"{base_name}Rise"
             else:
-                pct_name = f"{periods}day/sRise_{suffix}"
-                shift_name = f"{periods}day/sShift_{suffix}"
+                pct.name = f"{base_name}Rise_{suffix}"
 
 
-            return {
-                pct_name: pct,
-                shift_name: series.shift(periods)}
+            return pct
 
 
         return self.apply_to_columns(percentageChange, periods = periods, as_percent = as_percent)
+
+
+
+
+
+
+    def add_shift(self, periods = 1):
+        """
+        Add shifted versions of the original columns.
+
+        Naming:
+        - 'Price'          -> '5dayPriceShift'
+        - 'Price_idx'      -> '5dayPriceShift_idx'
+
+        Parameters
+        ----------
+        periods : int
+            Number of periods to shift.
+        """
+
+        def _shift(series, base, suffix, periods):
+            shifted = series.shift(periods)
+            
+            
+            day_part = "day" if periods == 1 else "days"
+            base_name = f"{periods}{day_part}{base}"
+
+            if suffix is None:
+                shifted.name = f"{base_name}Shift"
+            else:
+                shifted.name = f"{base_name}Shift_{suffix}"
+
+            return shifted
+
+
+        return self._apply(_shift, periods = periods)
+
+
+
+
 
 
 
